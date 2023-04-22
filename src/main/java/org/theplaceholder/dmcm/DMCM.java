@@ -51,6 +51,7 @@ public class DMCM {
 
             Thread t = new Thread(() -> {
                 try {
+                    if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
                     handleThread(tile, hand, xList, yList, zList, dir, xtList, ytList, ztList);
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                     throw new RuntimeException(e);
@@ -92,38 +93,47 @@ public class DMCM {
 
             setToInc(tile, hand, direction, i);
 
+            if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
+
             if (x > tx) pressCoord(x - tx, hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_X, tile);
             else pressCoord(x - tx, hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_X, tile);
+
+            if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
 
             if (y > ty) pressCoord(y - ty, hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_Y, tile);
             else pressCoord(y - ty, hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_Y, tile);
 
             if (z > tz) pressCoord(z - tz, hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_Z, tile);
             else pressCoord(z - tz, hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_Z, tile);
+
+            if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
         }
     }
 
     public static void sleep(){
         try {
-            Thread.sleep(1000);
+            Thread.sleep(250);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static void pressButton(Hand hand, BlockPos pos, Direction direction, CoordPanelBlock.CoordPanelButtons buttons) throws NoSuchFieldException, IllegalAccessException {
+        if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
         Minecraft.getInstance().getConnection().send(new CPlayerTryUseItemOnBlockPacket(hand, Utils.getButtonBlockRayTraceResult(pos, direction, buttons)));
         sleep();
     }
 
     public static void pressCoord(int num, Hand hand, Direction direction, CoordPanelBlock.CoordPanelButtons button, CoordPanelTileEntity tile) throws NoSuchFieldException, IllegalAccessException {
         for(int i = 0; i < Math.abs(num); i++){
+            if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
             pressButton(hand, tile.getBlockPos(), direction, button);
         }
     }
 
     public static void setToInc(CoordPanelTileEntity tile, Hand hand, Direction direction, int i) throws NoSuchFieldException, IllegalAccessException {
         while (tile.incrementValue != i){
+            if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
             pressButton(hand, tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.INCREMENT);
         }
     }
