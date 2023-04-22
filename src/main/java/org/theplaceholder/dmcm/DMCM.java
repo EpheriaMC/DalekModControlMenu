@@ -96,7 +96,7 @@ public class DMCM {
 
     public static void sleep(){
         try {
-            Thread.sleep(250);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
