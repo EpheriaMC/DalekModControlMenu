@@ -65,6 +65,10 @@ public class DMCM {
         System.out.println("xList: " + xList);
         System.out.println("yList: " + yList);
         System.out.println("zList: " + zList);
+
+        System.out.println("txList: " + txList);
+        System.out.println("tyList: " + tyList);
+        System.out.println("tzList: " + tzList);
         for(int p = 0; p <= 4; p++){
             int i = (int) Math.pow(10, p);
 
@@ -75,14 +79,27 @@ public class DMCM {
             int ty = tyList.getOrDefault(i, 0);
             int tz = tzList.getOrDefault(i, 0);
 
-            if (x > tx) pressCoord(Math.abs(x - tx), hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_X, tile, p);
-            else pressCoord(Math.abs(x - tx), hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_X, tile, p);
+            System.out.println("x: " + x);
+            System.out.println("y: " + y);
+            System.out.println("z: " + z);
+            System.out.println("tx: " + tx);
+            System.out.println("ty: " + ty);
+            System.out.println("tz: " + tz);
 
-            if (y > ty) pressCoord(Math.abs(y - ty), hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_Y, tile, p);
-            else pressCoord(Math.abs(y - ty), hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_Y, tile, p);
+            System.out.println("x - tx: " + (x - tx));
+            System.out.println("y - ty: " + (y - ty));
+            System.out.println("z - tz: " + (z - tz));
 
-            if (z > tz) pressCoord(Math.abs(z - tz), hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_Z, tile, p);
-            else pressCoord(Math.abs(z - tz), hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_Z, tile, p);
+            setToInc(tile, hand, direction, i);
+
+            if (x > tx) pressCoord(x - tx, hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_X, tile);
+            else pressCoord(x - tx, hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_X, tile);
+
+            if (y > ty) pressCoord(y - ty, hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_Y, tile);
+            else pressCoord(y - ty, hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_Y, tile);
+
+            if (z > tz) pressCoord(z - tz, hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_Z, tile);
+            else pressCoord(z - tz, hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_Z, tile);
         }
     }
 
@@ -99,42 +116,15 @@ public class DMCM {
         sleep();
     }
 
-    public static void pressCoord(int num, Hand hand, Direction direction, CoordPanelBlock.CoordPanelButtons button, CoordPanelTileEntity tile, int p) throws NoSuchFieldException, IllegalAccessException {
-        setToInc(tile, hand, direction, p);
-
-        num = Math.abs(num);
-
-        for(int i = 0; i < num; i++){
+    public static void pressCoord(int num, Hand hand, Direction direction, CoordPanelBlock.CoordPanelButtons button, CoordPanelTileEntity tile) throws NoSuchFieldException, IllegalAccessException {
+        for(int i = 0; i < Math.abs(num); i++){
             pressButton(hand, tile.getBlockPos(), direction, button);
         }
     }
 
-    public static void setToInc(CoordPanelTileEntity tile, Hand hand, Direction direction, int p) throws NoSuchFieldException, IllegalAccessException {
-        int j = tile.incrementValue;
-
-        int k = 0;
-
-        if (j == 1)
-            k = 0;
-        if (j == 10)
-            k = 1;
-        if (j == 100)
-            k = 2;
-        if (j == 1000)
-            k = 3;
-        if (j == 10000)
-            k = 4;
-
-        if(p != k){
-            if(p < k){
-                for(int l = 0; l < k - p; l++){
-                    pressButton(hand, tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.INCREMENT);
-                }
-            } else {
-                for(int l = 0; l < Math.abs(p - k); l++){
-                    pressButton(hand, tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.INCREMENT);
-                }
-            }
+    public static void setToInc(CoordPanelTileEntity tile, Hand hand, Direction direction, int i) throws NoSuchFieldException, IllegalAccessException {
+        while (tile.incrementValue != i){
+            pressButton(hand, tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.INCREMENT);
         }
     }
 }
