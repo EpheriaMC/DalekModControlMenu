@@ -30,21 +30,21 @@ public class DMCMScreen extends Screen {
     public void init(){
         this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
         FontRenderer font = Minecraft.getInstance().font;
-        Predicate<String> isInteger = s -> (s.charAt(0) == '-' || s.matches("\\d+"));
+        Predicate<String> isInteger = s -> ((s.charAt(0) == '-' && s.replace("-", "").matches("\\d+")) || s.matches("\\d+"));
         int j = this.height / 4 + 48;
-        x = new TextFieldWidget(font, this.width / 2 - 100, j, 98, 20, new StringTextComponent("X Coordinate"));
+        x = new TextFieldWidget(font, this.width / 2, j, 98, 20, new StringTextComponent("X Coordinate"));
         x.setFilter(isInteger);
         x.setBordered(true);
 
-        y = new TextFieldWidget(font, this.width / 2 - 100, j + 24, 98, 20, new StringTextComponent("Y Coordinate"));
+        y = new TextFieldWidget(font, this.width / 2, j + 24, 98, 20, new StringTextComponent("Y Coordinate"));
         y.setFilter(isInteger);
         y.setBordered(true);
 
-        z = new TextFieldWidget(font, this.width / 2 - 100, j + 24 * 2, 98, 20, new StringTextComponent("Z Coordinate"));
+        z = new TextFieldWidget(font, this.width / 2, j + 24 * 2, 98, 20, new StringTextComponent("Z Coordinate"));
         z.setFilter(isInteger);
         z.setBordered(true);
 
-        done = new Button(this.width / 2 - 100, j + 72 + 12, 98, 20, new StringTextComponent("Done"), (button) -> {
+        done = new Button(this.width / 2, j + 72 + 12, 98, 20, new StringTextComponent("Done"), (button) -> {
             if (!(x.getValue().equals("") || y.getValue().equals("") || z.getValue().equals(""))){
                 try {
                     DMCM.handle(Integer.parseInt(x.getValue()), Integer.parseInt(y.getValue()), Integer.parseInt(z.getValue()));

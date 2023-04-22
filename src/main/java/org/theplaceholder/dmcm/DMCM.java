@@ -25,6 +25,10 @@ public class DMCM {
 
     public DMCM() {}
 
+    public static boolean isCoordPanel() {
+        return (Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO);
+    }
+
     public static void handle(int x, int y, int z) throws NoSuchFieldException, IllegalAccessException, InterruptedException {
         Minecraft mc = Minecraft.getInstance();
         if (Utils.getCoordPanelAroundPlayer(mc.player) != BlockPos.ZERO) {
@@ -34,10 +38,6 @@ public class DMCM {
             Direction dir = mc.level.getBlockState(panelPos).getValue(RotatableTileEntityBase.FACING);
 
             BlockPos tPos = ClientTardisFlightCache.getTardisFlightData(panelPos).getPos();
-
-            System.out.println("x: " + x);
-            System.out.println("y: " + y);
-            System.out.println("z: " + z);
 
             Map<Integer, Integer> xList = Utils.getPowerMap(x);
             Map<Integer, Integer> yList = Utils.getPowerMap(y);
@@ -51,7 +51,7 @@ public class DMCM {
 
             Thread t = new Thread(() -> {
                 try {
-                    if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
+                    if(isCoordPanel()) return;
                     handleThread(tile, hand, xList, yList, zList, dir, xtList, ytList, ztList);
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                     throw new RuntimeException(e);
@@ -63,13 +63,6 @@ public class DMCM {
     }
 
     public static void handleThread(CoordPanelTileEntity tile, Hand hand, Map<Integer, Integer> xList, Map<Integer, Integer> yList, Map<Integer, Integer> zList, Direction direction, Map<Integer, Integer> txList, Map<Integer, Integer> tyList, Map<Integer, Integer> tzList) throws NoSuchFieldException, IllegalAccessException {
-        System.out.println("xList: " + xList);
-        System.out.println("yList: " + yList);
-        System.out.println("zList: " + zList);
-
-        System.out.println("txList: " + txList);
-        System.out.println("tyList: " + tyList);
-        System.out.println("tzList: " + tzList);
         for(int p = 0; p <= 4; p++){
             int i = (int) Math.pow(10, p);
 
@@ -80,33 +73,24 @@ public class DMCM {
             int ty = tyList.getOrDefault(i, 0);
             int tz = tzList.getOrDefault(i, 0);
 
-            System.out.println("x: " + x);
-            System.out.println("y: " + y);
-            System.out.println("z: " + z);
-            System.out.println("tx: " + tx);
-            System.out.println("ty: " + ty);
-            System.out.println("tz: " + tz);
-
-            System.out.println("x - tx: " + (x - tx));
-            System.out.println("y - ty: " + (y - ty));
-            System.out.println("z - tz: " + (z - tz));
-
             setToInc(tile, hand, direction, i);
 
-            if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
+            if(isCoordPanel()) return;
 
             if (x > tx) pressCoord(x - tx, hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_X, tile);
             else pressCoord(x - tx, hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_X, tile);
 
-            if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
+            if(isCoordPanel()) return;
 
             if (y > ty) pressCoord(y - ty, hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_Y, tile);
             else pressCoord(y - ty, hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_Y, tile);
 
+            if(isCoordPanel()) return;
+
             if (z > tz) pressCoord(z - tz, hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_Z, tile);
             else pressCoord(z - tz, hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_Z, tile);
 
-            if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
+            if(isCoordPanel()) return;
         }
     }
 
@@ -119,21 +103,21 @@ public class DMCM {
     }
 
     public static void pressButton(Hand hand, BlockPos pos, Direction direction, CoordPanelBlock.CoordPanelButtons buttons) throws NoSuchFieldException, IllegalAccessException {
-        if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
+        if(isCoordPanel()) return;
         Minecraft.getInstance().getConnection().send(new CPlayerTryUseItemOnBlockPacket(hand, Utils.getButtonBlockRayTraceResult(pos, direction, buttons)));
         sleep();
     }
 
     public static void pressCoord(int num, Hand hand, Direction direction, CoordPanelBlock.CoordPanelButtons button, CoordPanelTileEntity tile) throws NoSuchFieldException, IllegalAccessException {
         for(int i = 0; i < Math.abs(num); i++){
-            if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
+            if(isCoordPanel()) return;
             pressButton(hand, tile.getBlockPos(), direction, button);
         }
     }
 
     public static void setToInc(CoordPanelTileEntity tile, Hand hand, Direction direction, int i) throws NoSuchFieldException, IllegalAccessException {
         while (tile.incrementValue != i){
-            if(Utils.getCoordPanelAroundPlayer(Minecraft.getInstance().player) == BlockPos.ZERO) return;
+            if(isCoordPanel()) return;
             pressButton(hand, tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.INCREMENT);
         }
     }

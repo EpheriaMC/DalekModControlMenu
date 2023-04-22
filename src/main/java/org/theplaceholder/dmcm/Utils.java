@@ -2,7 +2,6 @@ package org.theplaceholder.dmcm;
 
 import com.swdteam.common.block.tardis.CoordPanelBlock;
 import com.swdteam.common.init.DMBlocks;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
