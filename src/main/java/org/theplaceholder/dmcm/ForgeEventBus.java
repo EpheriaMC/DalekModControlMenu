@@ -9,6 +9,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import static org.theplaceholder.dmcm.DMCM.isCoordPanel;
 import static org.theplaceholder.dmcm.DMCM.modid;
 
 @Mod.EventBusSubscriber(modid = modid, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -24,5 +25,8 @@ public class ForgeEventBus {
             else
                 mc.player.displayClientMessage(new StringTextComponent("Waiting for ClientTardisFlightCache to update..."), true);
         }
+
+        if (mc.player != null && isCoordPanel() && mc.screen instanceof DMCMScreen)
+            mc.screen.onClose();
     }
 }

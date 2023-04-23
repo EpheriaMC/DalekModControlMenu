@@ -32,6 +32,8 @@ public class DMCM {
     public static void handle(int x, int y, int z) throws NoSuchFieldException, IllegalAccessException, InterruptedException {
         Minecraft mc = Minecraft.getInstance();
         if (Utils.getCoordPanelAroundPlayer(mc.player) != BlockPos.ZERO) {
+
+
             BlockPos panelPos = Utils.getCoordPanelAroundPlayer(mc.player);
             CoordPanelTileEntity tile = (CoordPanelTileEntity) mc.player.level.getBlockEntity(panelPos);
 
@@ -52,12 +54,12 @@ public class DMCM {
             Thread t = new Thread(() -> {
                 try {
                     if(isCoordPanel()) return;
+
                     handleThread(tile, hand, xList, yList, zList, dir, xtList, ytList, ztList);
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
             });
-
             t.start();
         }
     }
@@ -73,7 +75,8 @@ public class DMCM {
             int ty = tyList.getOrDefault(i, 0);
             int tz = tzList.getOrDefault(i, 0);
 
-            setToInc(tile, hand, direction, i);
+            if(x != tz && y != ty && z != tz)
+                setToInc(tile, hand, direction, i);
 
             if(isCoordPanel()) return;
 
@@ -96,7 +99,7 @@ public class DMCM {
 
     public static void sleep(){
         try {
-            Thread.sleep(250);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
