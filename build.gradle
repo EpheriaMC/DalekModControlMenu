@@ -1,10 +1,12 @@
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://repo.spongepowered.org/maven' }
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.61'
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
 
@@ -12,8 +14,9 @@ apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
+apply plugin: 'org.spongepowered.mixin'
 
-version = '2.0'
+version = '2.1'
 group = 'org.theplaceholder.dmcm' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'DMCM'
 
@@ -146,6 +149,11 @@ dependencies {
 
     implementation fileTree(dir: './libs', includes: ['*.jar'])
 }
+
+mixin {
+    add sourceSets.main, "dmcm.refmap.json"
+}
+
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
     manifest {
@@ -156,7 +164,10 @@ jar {
             "Implementation-Title": project.name,
             "Implementation-Version": "${version}",
             "Implementation-Vendor" :"thePlaceholder",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
+            "TweakOrder": 0,
+            "MixinConfigs" : "dmcm.mixin.json"
         ])
     }
 }

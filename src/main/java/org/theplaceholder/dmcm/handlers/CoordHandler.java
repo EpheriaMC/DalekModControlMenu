@@ -36,8 +36,7 @@ public class CoordHandler{
             int ty = tyList.getOrDefault(i, 0);
             int tz = tzList.getOrDefault(i, 0);
 
-            if(x != tz && y != ty && z != tz)
-                setToInc(tile, hand, direction, i);
+            setToInc(tile, hand, direction, i);
 
             if(isNoCoordPanel()) return;
 

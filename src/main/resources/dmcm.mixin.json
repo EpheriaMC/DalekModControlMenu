@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "org.theplaceholder.dmcm.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "RenderBlockTardisMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "dmcm.refmap.json"
+}

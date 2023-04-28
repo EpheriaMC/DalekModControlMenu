@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.client.gui.widget.Slider;
 import org.lwjgl.system.CallbackI;
@@ -50,7 +51,7 @@ public class DMCMScreen extends Screen {
         z.setBordered(true);
 
         done = new Button((this.width / 2) - 49, j + 72 + 12 + 24, 98, 20, new StringTextComponent("Done"), (button) -> {
-            if (!(x.getValue().isEmpty() || y.getValue().isEmpty() || z.getValue().isEmpty() || x.getValue().isEmpty() || y.getValue().isEmpty() || z.getValue().equals("-"))){
+            if (!(x.getValue().isEmpty() || y.getValue().isEmpty() || z.getValue().isEmpty() || x.getValue().isEmpty() || y.getValue().isEmpty() || x.getValue().equals("-") || y.getValue().equals("-") || z.getValue().equals("-"))){
                 if (!CoordHandler.isNoCoordPanel())
                     CoordHandler.handle(Integer.parseInt(x.getValue()), Integer.parseInt(y.getValue()), Integer.parseInt(z.getValue()));
                 this.onClose();
@@ -68,6 +69,8 @@ public class DMCMScreen extends Screen {
 
         dimList = new Slider((this.width / 2) - 49, j + 72 + 12, 98, 20, new StringTextComponent(""), new StringTextComponent(""), 0, 4, 0, true, true,(s) -> {});
         dimList.showDecimal = false;
+        dimList.sliderValue = 0;
+
         this.addWidget(dimList);
     }
 
@@ -94,6 +97,7 @@ public class DMCMScreen extends Screen {
 
         dimList.active = dimPanel;
 
-        dimList.setMessage(new StringTextComponent("Dimension: " + TardisLocationRegistry.getLocationRegistryAsList().get(dimList.getValueInt()).getDimension().location().getPath().replace("_", " ").toUpperCase()));
+        if (dimList.getValueInt() < TardisLocationRegistry.getLocationRegistryAsList().size())
+            dimList.setMessage(new StringTextComponent("Dimension: " + TardisLocationRegistry.getLocationRegistryAsList().get(dimList.getValueInt()).getDimension().location().getPath().replace("_", " ").toUpperCase()));
     }
 }

@@ -1,8 +1,13 @@
 package org.theplaceholder.dmcm.utils;
 
+import com.swdteam.common.tardis.TardisData;
+import com.swdteam.common.tileentity.TardisTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Objects;
 
 public class Utils {
     public static BlockPos getBlockPanelAroundPlayer(PlayerEntity player, Block block) {
@@ -19,6 +24,10 @@ public class Utils {
         }
 
         return BlockPos.ZERO;
+    }
+
+    public static boolean getRenderTardis(String playerName, TardisData data, String exterior){
+        return (data.getOwner_name().equals(playerName) && data.getTardisExterior().getRegistryName() == new ResourceLocation("dalekmod", exterior));
     }
 }
 
