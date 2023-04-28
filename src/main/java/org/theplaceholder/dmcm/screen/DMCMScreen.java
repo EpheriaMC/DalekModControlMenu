@@ -70,6 +70,7 @@ public class DMCMScreen extends Screen {
         dimList = new Slider((this.width / 2) - 49, j + 72 + 12, 98, 20, new StringTextComponent(""), new StringTextComponent(""), 0, 4, 0, true, true,(s) -> {});
         dimList.showDecimal = false;
         dimList.sliderValue = 0;
+        dimList.setValue(TardisLocationRegistry.getLocationRegistryAsList().indexOf(TardisLocationRegistry.getLocationForKey(minecraft.level.dimension())));
 
         this.addWidget(dimList);
     }

@@ -49,8 +49,10 @@ public class DimHandler {
                 pressButton(Hand.MAIN_HAND, getButtonBlockRayTraceResult(pos, dir, DimensionSelectorPanelBlock.DimensionPanelButtons.BTN_RIGHT));
             }
         else
-            for (int i = Math.abs(id - orId); i > 0; i--)
+            for (int i = Math.abs(id - orId); i > 0; i--) {
                 pressButton(Hand.MAIN_HAND, getButtonBlockRayTraceResult(pos, dir, DimensionSelectorPanelBlock.DimensionPanelButtons.BTN_LEFT));
+            }
+        pressButton(Hand.MAIN_HAND, getButtonBlockRayTraceResult(pos, dir, DimensionSelectorPanelBlock.DimensionPanelButtons.BTN_SELECT));
     }
 
     public static BlockRayTraceResult getButtonBlockRayTraceResult(BlockPos pos, Direction side, DimensionSelectorPanelBlock.DimensionPanelButtons button) throws IllegalAccessException, NoSuchFieldException {

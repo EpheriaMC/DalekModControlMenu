@@ -42,11 +42,10 @@ public abstract class RenderBlockTardisMixin {
                 Tardis tardisData = data.getTardisExterior();
                 MODEL_TARDIS = ExteriorModels.getModel(tardisData.getData().getModel(data.getSkinID()));
 
-                if(Utils.getRenderTardis("thePlaceholder", data, "tardis_capsule")) {
+                if(Utils.getRenderTardis("thePlaceholder", data, "tardis_capsule", 0)) {
                     MODEL_TARDIS = ExteriorModels.getModel(new ResourceLocation("dmcm", "models/tileentity/tardis/placeholder_tardis_capsule.json"));
                 }
-
-
+                
                 IVertexBuilder ivertexbuilder;
                 if ((double)tardis.pulses > 0.0126415478 && tardis.pulses < 1.0F) {
                     ivertexbuilder = iRenderTypeBuffer.getBuffer(RenderType.entityTranslucent(JSONModel.ModelInformation.generateAlphaMap(MODEL_TARDIS.getModelData().getTexture())));
