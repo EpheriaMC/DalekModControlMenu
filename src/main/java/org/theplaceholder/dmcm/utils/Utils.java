@@ -27,7 +27,7 @@ public class Utils {
     }
 
     public static boolean getRenderTardis(String playerName, TardisData data, String exterior){
-        return (data.getOwner_name().equals(playerName) && data.getTardisExterior().getRegistryName() == new ResourceLocation("dalekmod", exterior));
+        return (data.getOwner_name().equals(playerName) && Objects.equals(data.getTardisExterior().getRegistryName(), new ResourceLocation("dalekmod", exterior)));
     }
 }
 

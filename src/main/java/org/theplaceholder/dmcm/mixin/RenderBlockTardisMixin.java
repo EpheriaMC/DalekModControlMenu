@@ -42,7 +42,7 @@ public abstract class RenderBlockTardisMixin {
                 Tardis tardisData = data.getTardisExterior();
                 MODEL_TARDIS = ExteriorModels.getModel(tardisData.getData().getModel(data.getSkinID()));
 
-                if(Utils.getRenderTardis("thePlaceholder", data, "models/tileentity/tardis/gray_tardis_capsule.json")) {
+                if(Utils.getRenderTardis("thePlaceholder", data, "tardis_capsule")) {
                     MODEL_TARDIS = ExteriorModels.getModel(new ResourceLocation("dmcm", "models/tileentity/tardis/placeholder_tardis_capsule.json"));
                 }
 
