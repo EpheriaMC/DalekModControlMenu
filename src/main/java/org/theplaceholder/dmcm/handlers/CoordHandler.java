@@ -18,9 +18,9 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.theplaceholder.dmcm.handlers.ButtonHandler.pressButton;
+import static org.theplaceholder.dmcm.utils.ButtonUtils.pressButton;
 
-public class CoordHandler {
+public class CoordHandler{
     public static boolean isNoCoordPanel() {
         return (Utils.getBlockPanelAroundPlayer(Minecraft.getInstance().player, DMBlocks.COORD_PANEL.get()) == BlockPos.ZERO);
     }
