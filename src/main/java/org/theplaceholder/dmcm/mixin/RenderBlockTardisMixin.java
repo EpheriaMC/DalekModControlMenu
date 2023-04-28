@@ -5,8 +5,6 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.swdteam.client.render.tileentity.RenderBlockTardis;
 import com.swdteam.client.tardis.data.ClientTardisCache;
 import com.swdteam.client.tardis.data.ExteriorModels;
-import com.swdteam.common.init.DMTardis;
-import com.swdteam.common.init.DMTardisRegistry;
 import com.swdteam.common.tardis.Tardis;
 import com.swdteam.common.tardis.TardisData;
 import com.swdteam.common.tileentity.DMTileEntityBase;
@@ -45,7 +43,7 @@ public abstract class RenderBlockTardisMixin {
                 if(Utils.getRenderTardis("thePlaceholder", data, "tardis_capsule", 0)) {
                     MODEL_TARDIS = ExteriorModels.getModel(new ResourceLocation("dmcm", "models/tileentity/tardis/placeholder_tardis_capsule.json"));
                 }
-                
+
                 IVertexBuilder ivertexbuilder;
                 if ((double)tardis.pulses > 0.0126415478 && tardis.pulses < 1.0F) {
                     ivertexbuilder = iRenderTypeBuffer.getBuffer(RenderType.entityTranslucent(JSONModel.ModelInformation.generateAlphaMap(MODEL_TARDIS.getModelData().getTexture())));
