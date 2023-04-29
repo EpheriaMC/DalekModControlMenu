@@ -18,7 +18,7 @@ public class DMCM {
     public static final String modid = "dmcm";
     public static final KeyBinding key = new KeyBinding("key." + modid + ".openui", KeyEvent.VK_Y, "key.category." + modid);
     public static final File file = new File(Minecraft.getInstance().gameDirectory, "dmcm-waypoints.json");
-    public static Waypoint.WaypointsList waypointsList = new Waypoint.WaypointsList();
+    public static Waypoint.WaypointsList waypointsList;
 
 
     public static final Gson gson = new Gson();
@@ -26,5 +26,8 @@ public class DMCM {
     public DMCM() throws IOException {
         if (!file.exists())
             file.createNewFile();
+
+        waypointsList = new Waypoint.WaypointsList();
+        waypointsList.load();
     }
 }

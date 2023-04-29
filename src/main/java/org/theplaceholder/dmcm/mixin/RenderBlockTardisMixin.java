@@ -27,6 +27,10 @@ public abstract class RenderBlockTardisMixin {
 
     @Shadow public static JSONModel MODEL_TARDIS;
 
+    /**
+     * @author thePlaceholder
+     * @reason added Custom Tardis Model
+     */
     @Overwrite
     public void render(DMTileEntityBase dmTileEntityBase, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer iRenderTypeBuffer, int combinedLightIn, int combinedOverlayIn){
         try {
