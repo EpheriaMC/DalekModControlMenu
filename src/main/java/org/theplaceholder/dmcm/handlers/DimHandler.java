@@ -11,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3d;
+import org.theplaceholder.dmcm.mixin.DimensionPanelButtonsAccessor;
 import org.theplaceholder.dmcm.utils.Utils;
 
 import java.lang.reflect.Field;
@@ -56,14 +57,9 @@ public class DimHandler {
     }
 
     public static BlockRayTraceResult getButtonBlockRayTraceResult(BlockPos pos, Direction side, DimensionSelectorPanelBlock.DimensionPanelButtons button) throws IllegalAccessException, NoSuchFieldException {
-        Field fValues =  DimensionSelectorPanelBlock.DimensionPanelButtons.class.getDeclaredField("values");
-        fValues.setAccessible(true);
-        Map<Direction, Vector2f> values = (Map<Direction, Vector2f>) fValues.get(button);
-        Vector2f vec = values.get(side);
-
-        Field fHeight = DimensionSelectorPanelBlock.DimensionPanelButtons.class.getDeclaredField("height");
-        fHeight.setAccessible(true);
-        float height = (float) fHeight.get(button);
+        DimensionPanelButtonsAccessor accessor = (DimensionPanelButtonsAccessor)(Object) button;
+        Vector2f vec = accessor.getValues().get(side);
+        float height = accessor.getHeight();
 
         float hitX = vec.x;
         float hitY = height / 2.0F;

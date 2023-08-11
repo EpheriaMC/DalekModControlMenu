@@ -12,9 +12,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3d;
+import org.theplaceholder.dmcm.mixin.CoordPanelButtonsAccessor;
 import org.theplaceholder.dmcm.utils.Utils;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -106,14 +106,10 @@ public class CoordHandler{
     }
 
     public static BlockRayTraceResult getButtonBlockRayTraceResult(BlockPos pos, Direction side, CoordPanelBlock.CoordPanelButtons button) throws IllegalAccessException, NoSuchFieldException {
-        Field fValues = CoordPanelBlock.CoordPanelButtons.class.getDeclaredField("values");
-        fValues.setAccessible(true);
-        Map<Direction, Vector2f> values = (Map<Direction, Vector2f>) fValues.get(button);
-        Vector2f vec = values.get(side);
+        CoordPanelButtonsAccessor accessor = (CoordPanelButtonsAccessor)(Object) button;
 
-        Field fHeight = CoordPanelBlock.CoordPanelButtons.class.getDeclaredField("height");
-        fHeight.setAccessible(true);
-        float height = (float) fHeight.get(button);
+        Vector2f vec = accessor.getValues().get(side);
+        float height = accessor.getHeight();
 
         float hitX = vec.x;
         float hitY = height / 2.0F;
@@ -123,48 +119,47 @@ public class CoordHandler{
 
     public static Map<Integer, Integer> getPowerMap(int value) {
         boolean isNegative = false;
-        Map<Integer, Integer> map = new HashMap<>();
-
-        String sValue = Integer.toString(value);
-        if (sValue.contains("-"))
+        if (value < 0) {
             isNegative = true;
+            value = -value;
+        }
 
-        sValue = sValue.replace("-", "");
+        Map<Integer, Integer> map = new HashMap<>();
+        String sValue = Integer.toString(value);
 
         int[] ints = new int[sValue.length()];
-        for (int i = 0; i < sValue.length(); i++)
-        {
+        for (int i = 0; i < sValue.length(); i++) {
             ints[i] = sValue.charAt(i) - '0';
         }
         invertIntArray(ints);
 
-        map.put(1, ints[0]);
-        if (ints.length >= 2)
-            map.put(10, ints[1]);
-        if (ints.length >= 3)
-            map.put(100, ints[2]);
-        if (ints.length >= 4)
-            map.put(1000, ints[3]);
-
-        if (ints.length >= 5){
-            String s = "";
-            for (int i = ints.length-1; i >= 4; i--)
-                s += ints[i];
-            if(!s.equals(""))
-                map.put(10000, Integer.parseInt(s));
+        int[] powers = {1, 10, 100, 1000};
+        for (int i = 0; i < Math.min(ints.length, powers.length); i++) {
+            map.put(powers[i], ints[i]);
         }
 
-        if (isNegative)
+        if (ints.length > powers.length) {
+            int multiplier = 1;
+            for (int i = powers.length; i < ints.length; i++) {
+                map.put(10 * multiplier, ints[i]);
+                multiplier *= 10;
+            }
+        }
+
+        if (isNegative) {
             map.replaceAll((k, v) -> -v);
+        }
 
         return map;
     }
 
+
     public static void invertIntArray(int[] arr) {
-        for (int i = 0; i < arr.length / 2; i++) {
+        int length = arr.length;
+        for (int i = 0; i < length / 2; i++) {
             int temp = arr[i];
-            arr[i] = arr[arr.length - 1 - i];
-            arr[arr.length - 1 - i] = temp;
+            arr[i] = arr[length - 1 - i];
+            arr[length - 1 - i] = temp;
         }
     }
 }

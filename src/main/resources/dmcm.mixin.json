@@ -3,10 +3,12 @@
   "package": "org.theplaceholder.dmcm.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "RenderBlockTardisMixin"
+    "CoordPanelButtonsAccessor",
+    "RenderBlockTardisMixin",
+    "DimensionPanelButtonsAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
   },
-  "refmap": "dmcm.refmap.json"
+  "refmap": "dmcm.refmap.json",
 }

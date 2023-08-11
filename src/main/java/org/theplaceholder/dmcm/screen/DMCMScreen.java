@@ -202,8 +202,16 @@ public class DMCMScreen extends Screen {
     }
 
     public Predicate<String> getValidCoord(){
-        Predicate<String> isInteger = s -> (s != null && (s.isEmpty() || s.matches("-?[0-9]+") || s.equals("-"))) && !CoordHandler.isNoCoordPanel();
-        return isInteger;
+        return DMCMScreen::isValidNumber;
+    }
+
+    public static boolean isValidNumber(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     public void refreshList(){
