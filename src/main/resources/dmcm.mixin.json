@@ -10,5 +10,5 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "refmap": "dmcm.refmap.json",
+  "refmap": "dmcm.refmap.json"
 }

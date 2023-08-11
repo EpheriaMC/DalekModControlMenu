@@ -14,9 +14,6 @@ import net.minecraft.util.math.vector.Vector3d;
 import org.theplaceholder.dmcm.mixin.DimensionPanelButtonsAccessor;
 import org.theplaceholder.dmcm.utils.Utils;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-
 import static org.theplaceholder.dmcm.utils.ButtonUtils.pressButton;
 
 public class DimHandler {
