@@ -17,50 +17,28 @@ import net.minecraft.util.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.theplaceholder.dmcm.utils.Utils;
 
 @Mixin(value = RenderBlockTardis.class, remap = false)
 public abstract class RenderBlockTardisMixin {
 
-    @Shadow protected abstract void renderTardis(IVertexBuilder ivertexbuilder, Tardis tardisData, TardisData data, MatrixStack matrixStack, IRenderTypeBuffer iRenderTypeBuffer, TardisTileEntity tardis, float partialTicks, int combinedLightIn, int combinedOverlayIn, float tardisDematPulse, boolean main);
     @Shadow protected abstract void renderTardis(IVertexBuilder ivertexbuilder, Tardis tardisData, TardisData data, MatrixStack matrixStack, IRenderTypeBuffer iRenderTypeBuffer, TardisTileEntity tardis, float partialTicks, int combinedLightIn, int combinedOverlayIn, float tardisDematPulse);
 
     @Shadow public static JSONModel MODEL_TARDIS;
 
-    /**
-     * @author thePlaceholder
-     * @reason added Custom Tardis Model
-     */
-    @Overwrite
-    public void render(DMTileEntityBase dmTileEntityBase, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer iRenderTypeBuffer, int combinedLightIn, int combinedOverlayIn){
-        try {
-            if (dmTileEntityBase instanceof TardisTileEntity) {
-                TardisTileEntity tardis = (TardisTileEntity)dmTileEntityBase;
-                TardisData data = ClientTardisCache.getTardisData(tardis.globalID);
-                if (data == null || !Minecraft.getInstance().getResourceManager().hasResource(data.getTardisExterior().getData().getModel(data.getSkinID()))) {
-                    data = ClientTardisCache.DEFAULT_DATA;
-                }
-
-                Tardis tardisData = data.getTardisExterior();
-                MODEL_TARDIS = ExteriorModels.getModel(tardisData.getData().getModel(data.getSkinID()));
-
-                if(Utils.getRenderTardis("thePlaceholder", data, "tardis_capsule", 0)) {
-                    MODEL_TARDIS = ExteriorModels.getModel(new ResourceLocation("dmcm", "models/tileentity/tardis/placeholder_tardis_capsule.json"));
-                }
-
-                IVertexBuilder ivertexbuilder;
-                if ((double)tardis.pulses > 0.0126415478 && tardis.pulses < 1.0F) {
-                    ivertexbuilder = iRenderTypeBuffer.getBuffer(RenderType.entityTranslucent(JSONModel.ModelInformation.generateAlphaMap(MODEL_TARDIS.getModelData().getTexture())));
-                    this.renderTardis(ivertexbuilder, tardisData, data, matrixStack, iRenderTypeBuffer, tardis, partialTicks, combinedLightIn, combinedOverlayIn, 1.0F);
-                    if (MODEL_TARDIS.getModelData().getAlphaMap() != null) {
-                        IVertexBuilder ivertexbuilder3 = iRenderTypeBuffer.getBuffer(RenderType.entityTranslucent(MODEL_TARDIS.getModelData().getAlphaMap()));
-                        this.renderTardis(ivertexbuilder3, tardisData, data, matrixStack, iRenderTypeBuffer, tardis, partialTicks, combinedLightIn, combinedOverlayIn, tardis.pulses);
-                    }
-                }
-
-                ivertexbuilder = iRenderTypeBuffer.getBuffer(RenderType.entityTranslucent(MODEL_TARDIS.getModelData().getTexture()));
-                this.renderTardis(ivertexbuilder, tardisData, data, matrixStack, iRenderTypeBuffer, tardis, partialTicks, combinedLightIn, combinedOverlayIn, tardis.pulses, true);
+    @Inject(method = "render(Lcom/swdteam/common/tileentity/DMTileEntityBase;FLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;II)V", at = @At("HEAD"), cancellable = true)
+    private static void render(DMTileEntityBase dmTileEntityBase, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer iRenderTypeBuffer, int combinedLightIn, int combinedOverlayIn, CallbackInfo ci){
+        if (dmTileEntityBase instanceof TardisTileEntity){
+            TardisTileEntity tardisTileEntity = (TardisTileEntity) dmTileEntityBase;
+            TardisData data = ClientTardisCache.getTardisData(tardisTileEntity.globalID);
+            if(Utils.getRenderTardis("thePlaceholder", data, "tardis_capsule", 0)) {
+                MODEL_TARDIS = ExteriorModels.getModel(new ResourceLocation("dmcm", "models/tileentity/tardis/placeholder_tardis_capsule.json"));
             }
-        } catch (Exception ignored) {}
+        }
     }
+
+
 }

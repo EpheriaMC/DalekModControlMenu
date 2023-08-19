@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3d;
+import org.theplaceholder.dmcm.interfaces.ButtonsAccessor;
 import org.theplaceholder.dmcm.mixin.CoordPanelButtonsAccessor;
 import org.theplaceholder.dmcm.utils.Utils;
 
@@ -106,7 +107,7 @@ public class CoordHandler{
     }
 
     public static BlockRayTraceResult getButtonBlockRayTraceResult(BlockPos pos, Direction side, CoordPanelBlock.CoordPanelButtons button) throws IllegalAccessException, NoSuchFieldException {
-        CoordPanelButtonsAccessor accessor = (CoordPanelButtonsAccessor)(Object) button;
+        ButtonsAccessor accessor = (ButtonsAccessor)(Object) button;
 
         Vector2f vec = accessor.getValues().get(side);
         float height = accessor.getHeight();
