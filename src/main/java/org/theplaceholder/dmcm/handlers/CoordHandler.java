@@ -93,13 +93,13 @@ public class CoordHandler{
 
             Hand hand = Hand.MAIN_HAND;
 
-            Minecraft.getInstance().submitAsync(() -> {
+            new Thread(() -> {
                 try {
                     handleThread(tile, hand, xList, yList, zList, dir, xtList, ytList, ztList);
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
-            });
+            }).start();
         }
     }
 

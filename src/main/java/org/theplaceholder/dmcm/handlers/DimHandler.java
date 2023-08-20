@@ -29,13 +29,13 @@ public class DimHandler {
             Direction dir = mc.level.getBlockState(panelPos).getValue(RotatableTileEntityBase.FACING);
             DimensionSelectorTileEntity tile = (DimensionSelectorTileEntity) mc.level.getBlockEntity(panelPos);
 
-            Minecraft.getInstance().submitAsync(() -> {
+            new Thread(() -> {
                 try {
                     handleThread(id, tile.getIndex(), panelPos, dir);
                 } catch (NoSuchFieldException | IllegalAccessException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
-            });
+            }).start();
         }
     }
 
