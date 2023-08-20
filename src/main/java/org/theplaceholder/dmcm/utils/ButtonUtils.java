@@ -14,7 +14,7 @@ public class ButtonUtils {
 
     public static void sleep(){
         try {
-            Thread.sleep(500);
+            Thread.sleep(250);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
