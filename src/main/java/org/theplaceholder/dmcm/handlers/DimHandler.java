@@ -12,7 +12,6 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3d;
 import org.theplaceholder.dmcm.interfaces.ButtonsAccessor;
-import org.theplaceholder.dmcm.mixin.DimensionPanelButtonsAccessor;
 import org.theplaceholder.dmcm.utils.Utils;
 
 import static org.theplaceholder.dmcm.utils.ButtonUtils.pressButton;
@@ -30,15 +29,13 @@ public class DimHandler {
             Direction dir = mc.level.getBlockState(panelPos).getValue(RotatableTileEntityBase.FACING);
             DimensionSelectorTileEntity tile = (DimensionSelectorTileEntity) mc.level.getBlockEntity(panelPos);
 
-            Thread t = new Thread(() -> {
-                if (isNoDimPanel()) return;
+            Minecraft.getInstance().submitAsync(() -> {
                 try {
                     handleThread(id, tile.getIndex(), panelPos, dir);
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
             });
-            t.start();
         }
     }
 

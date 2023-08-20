@@ -3,6 +3,8 @@ package org.theplaceholder.dmcm;
 import com.google.gson.Gson;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import org.theplaceholder.dmcm.utils.Waypoint;
 
@@ -23,11 +25,17 @@ public class DMCM {
 
     public static final Gson gson = new Gson();
 
-    public DMCM() throws IOException {
-        if (!file.exists())
-            file.createNewFile();
+    public DMCM() {
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            try {
+                if (!file.exists())
+                    file.createNewFile();
 
-        waypointsList = new Waypoint.WaypointsList();
-        waypointsList.load();
+                waypointsList = new Waypoint.WaypointsList();
+                waypointsList.load();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        });
     }
 }

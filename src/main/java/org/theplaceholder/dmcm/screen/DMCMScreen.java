@@ -202,10 +202,13 @@ public class DMCMScreen extends Screen {
     }
 
     public Predicate<String> getValidCoord(){
-        return DMCMScreen::isValidNumber;
+        return DMCMScreen::isStringNumber;
     }
 
-    public static boolean isValidNumber(String str) {
+    public static boolean isStringNumber(String str) {
+        if (str.isEmpty() || str.equals("-"))
+            return true;
+
         try {
             Integer.parseInt(str);
             return true;
