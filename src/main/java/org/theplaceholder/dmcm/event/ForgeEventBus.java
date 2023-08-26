@@ -1,11 +1,14 @@
 package org.theplaceholder.dmcm.event;
 
+import com.swdteam.client.tardis.data.ClientTardisCache;
 import com.swdteam.client.tardis.data.ClientTardisFlightCache;
+import com.swdteam.common.tardis.TardisData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import org.theplaceholder.dmcm.DMCM;
 import org.theplaceholder.dmcm.handlers.CoordHandler;
@@ -22,26 +25,29 @@ public class ForgeEventBus {
     @SubscribeEvent
     public static void clientTick(TickEvent.ClientTickEvent event) {
         Minecraft mc = Minecraft.getInstance();
-
-        if (shouldOpenDMCMScreen(mc)) {
-            mc.setScreen(new DMCMScreen());
-        }
-
-        ticks++;
-        if (ticks >= TICKS_BETWEEN_ACTIONS) {
-            if (DimHandler.isRunning) {
-                DimHandler.tick();
+        if (DMCM.key.isDown() && mc.player != null){
+            TardisData tardisData = ClientTardisCache.getTardisData(mc.player.blockPosition());
+            if (tardisData != null) {
+                mc.setScreen(new DMCMScreen());
+            } else {
+                mc.player.displayClientMessage(new StringTextComponent("Waiting for ClientTardisCache to Update"), true);
             }
-            if (CoordHandler.isRunning) {
-                CoordHandler.tick();
-            }
-
-            ticks = 0;
         }
     }
 
-    private static boolean shouldOpenDMCMScreen(Minecraft mc) {
-        return DMCM.key.isDown() && mc.player != null && !(mc.screen instanceof DMCMScreen) && mc.level != null &&
-                ClientTardisFlightCache.hasTardisFlightData(mc.player.blockPosition());
+    @SubscribeEvent
+    public static void playerTick(TickEvent.PlayerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END && event.side == LogicalSide.CLIENT) {
+            ticks++;
+            if (ticks >= TICKS_BETWEEN_ACTIONS) {
+                if (DimHandler.isRunning) {
+                    DimHandler.tick();
+                }else if (CoordHandler.isRunning) {
+                    CoordHandler.tick();
+                }
+
+                ticks = 0;
+            }
+        }
     }
 }

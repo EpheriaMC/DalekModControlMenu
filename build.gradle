@@ -46,11 +46,8 @@ minecraft {
         client {
             workingDirectory project.file('run')
 
-            // Recommended logging data for a userdev environment
-            // The markers can be changed as needed.
-            // "SCAN": For mods scan.
-            // "REGISTRIES": For firing of registry events.
-            // "REGISTRYDUMP": For getting the contents of all registries.
+            arg "-mixin.config=dmcm.mixin.json"
+
             property 'forge.logging.markers', 'REGISTRIES'
 
             // Recommended logging level for the console
@@ -60,7 +57,6 @@ minecraft {
 
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-
             mods {
                 DMCM {
                     source sourceSets.main
@@ -70,7 +66,7 @@ minecraft {
 
         server {
             workingDirectory project.file('run')
-
+            arg "-mixin.config=dmcm.mixin.json"
             // Recommended logging data for a userdev environment
             // The markers can be changed as needed.
             // "SCAN": For mods scan.

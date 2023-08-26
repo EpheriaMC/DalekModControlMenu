@@ -28,6 +28,8 @@ public class CoordHandler {
     public static int LOOP = 0;
     public static boolean isIncTick = true;
 
+    public static int x, y, z;
+
     private static final int MAX_LOOP = 4;
 
     public static boolean isNoCoordPanel() {
@@ -43,9 +45,12 @@ public class CoordHandler {
         if (LOOP <= MAX_LOOP) {
             int i = (int) Math.pow(10, LOOP);
 
-            int x = xList.getOrDefault(i, 0);
-            int y = yList.getOrDefault(i, 0);
-            int z = zList.getOrDefault(i, 0);
+            if (x == 0 && y == 0 && z == 0){
+                x = xList.getOrDefault(i, 0);
+                y = yList.getOrDefault(i, 0);
+                z = zList.getOrDefault(i, 0);
+            }
+
             int tx = txList.getOrDefault(i, 0);
             int ty = tyList.getOrDefault(i, 0);
             int tz = tzList.getOrDefault(i, 0);
@@ -60,24 +65,38 @@ public class CoordHandler {
                     isIncTick = true;
                 }
             } else if (x != tx) {
-                pressCoord(hand, direction, x, tx, CoordPanelBlock.CoordPanelButtons.ADD_X, CoordPanelBlock.CoordPanelButtons.SUB_X);
+                if (x < tx) {
+                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.SUB_X));
+                    x++;
+                } else {
+                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.ADD_X));
+                    x--;
+                }
             } else if (y != ty) {
-                pressCoord(hand, direction, y, ty, CoordPanelBlock.CoordPanelButtons.ADD_Y, CoordPanelBlock.CoordPanelButtons.SUB_Y);
+                if (y < ty) {
+                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.SUB_Y));
+                    y++;
+                } else {
+                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.ADD_Y));
+                    y--;
+                }
             } else if (z != tz) {
-                pressCoord(hand, direction, z, tz, CoordPanelBlock.CoordPanelButtons.ADD_Z, CoordPanelBlock.CoordPanelButtons.SUB_Z);
+                if (z < tz) {
+                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.SUB_Z));
+                    z++;
+                } else {
+                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.ADD_Z));
+                    z--;
+                }
             } else {
                 LOOP++;
+                x = 0;
+                y = 0;
+                z = 0;
             }
         } else {
             LOOP = 0;
-        }
-    }
-
-    private static void pressCoord(Hand hand, Direction direction, int current, int target, CoordPanelBlock.CoordPanelButtons addButton, CoordPanelBlock.CoordPanelButtons subButton) {
-        if (current > target) {
-            pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, subButton));
-        } else {
-            pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, addButton));
+            isRunning = false;
         }
     }
 
