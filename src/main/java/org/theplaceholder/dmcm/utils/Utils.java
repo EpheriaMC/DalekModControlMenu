@@ -2,9 +2,13 @@ package org.theplaceholder.dmcm.utils;
 
 import com.swdteam.common.tardis.TardisData;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.play.client.CPlayerTryUseItemOnBlockPacket;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 
 import java.util.Objects;
 
@@ -21,12 +25,11 @@ public class Utils {
                 }
             }
         }
-
         return BlockPos.ZERO;
     }
 
-    public static boolean getRenderTardis(String playerName, TardisData data, String exterior, int id){
-        return (data.getOwner_name().equals(playerName) && Objects.equals(data.getTardisExterior().getRegistryName(), new ResourceLocation("dalekmod", exterior)) && data.getSkinID() == id);
+    public static void pressButton(Hand hand, BlockRayTraceResult rayTraceResult){
+        Minecraft.getInstance().getConnection().send(new CPlayerTryUseItemOnBlockPacket(hand, rayTraceResult));
     }
 }
 

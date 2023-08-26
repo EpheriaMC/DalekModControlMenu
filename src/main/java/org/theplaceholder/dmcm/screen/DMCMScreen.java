@@ -2,6 +2,7 @@ package org.theplaceholder.dmcm.screen;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.swdteam.client.tardis.data.ClientTardisFlightCache;
+import com.swdteam.common.block.tardis.DimensionSelectorPanelBlock;
 import com.swdteam.common.init.DMBlocks;
 import com.swdteam.common.tardis.data.TardisLocationRegistry;
 import com.swdteam.common.tileentity.tardis.DimensionSelectorTileEntity;
@@ -198,7 +199,7 @@ public class DMCMScreen extends Screen {
 
     public void updateDim(){
         if (dimList.getValueInt() < TardisLocationRegistry.getLocationRegistryAsList().size() && dimList.getValueInt() >= 0)
-            dimList.setMessage(new StringTextComponent("Dimension: " + TardisLocationRegistry.getLocationRegistryAsList().get(dimList.getValueInt()).getDimension().location().getPath().replace("_", " ").toUpperCase().replace("MINECRAFT ", "")));
+            dimList.setMessage(new StringTextComponent("Dimension: " + TardisLocationRegistry.getLocationRegistryAsList().get(dimList.getValueInt()).getDimensionName()));
     }
 
     public Predicate<String> getValidCoord(){

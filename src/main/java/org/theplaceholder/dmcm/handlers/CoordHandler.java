@@ -13,22 +13,35 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3d;
 import org.theplaceholder.dmcm.interfaces.ButtonsAccessor;
-import org.theplaceholder.dmcm.mixin.CoordPanelButtonsAccessor;
 import org.theplaceholder.dmcm.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.theplaceholder.dmcm.utils.ButtonUtils.pressButton;
+import static org.theplaceholder.dmcm.utils.Utils.pressButton;
 
-public class CoordHandler{
+public class CoordHandler {
+    public static boolean isRunning = false;
+    public static Map<Integer, Integer> xList, yList, zList, txList, tyList, tzList;
+    public static CoordPanelTileEntity tile;
+    public static Direction direction;
+    public static int LOOP = 0;
+    public static boolean isIncTick = true;
+
+    private static final int MAX_LOOP = 4;
+
     public static boolean isNoCoordPanel() {
-        return (Utils.getBlockPanelAroundPlayer(Minecraft.getInstance().player, DMBlocks.COORD_PANEL.get()) == BlockPos.ZERO);
+        return Utils.getBlockPanelAroundPlayer(Minecraft.getInstance().player, DMBlocks.COORD_PANEL.get()) == BlockPos.ZERO;
     }
 
-    public static void handleThread(CoordPanelTileEntity tile, Hand hand, Map<Integer, Integer> xList, Map<Integer, Integer> yList, Map<Integer, Integer> zList, Direction direction, Map<Integer, Integer> txList, Map<Integer, Integer> tyList, Map<Integer, Integer> tzList) throws NoSuchFieldException, IllegalAccessException {
-        for(int p = 0; p <= 4; p++){
-            int i = (int) Math.pow(10, p);
+    public static void tick() {
+        if (isNoCoordPanel()) {
+            isRunning = false;
+            return;
+        }
+
+        if (LOOP <= MAX_LOOP) {
+            int i = (int) Math.pow(10, LOOP);
 
             int x = xList.getOrDefault(i, 0);
             int y = yList.getOrDefault(i, 0);
@@ -37,38 +50,34 @@ public class CoordHandler{
             int ty = tyList.getOrDefault(i, 0);
             int tz = tzList.getOrDefault(i, 0);
 
-            setToInc(tile, hand, direction, i);
+            Hand hand = Hand.MAIN_HAND;
 
-            if(isNoCoordPanel()) return;
-
-            if (x > tx) pressCoord(x - tx, hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_X, tile);
-            else pressCoord(x - tx, hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_X, tile);
-
-            if(isNoCoordPanel()) return;
-
-            if (y > ty) pressCoord(y - ty, hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_Y, tile);
-            else pressCoord(y - ty, hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_Y, tile);
-
-            if(isNoCoordPanel()) return;
-
-            if (z > tz) pressCoord(z - tz, hand, direction, CoordPanelBlock.CoordPanelButtons.ADD_Z, tile);
-            else pressCoord(z - tz, hand, direction, CoordPanelBlock.CoordPanelButtons.SUB_Z, tile);
-
-            if(isNoCoordPanel()) return;
+            if (tile.incrementValue != i) {
+                if (isIncTick) {
+                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.INCREMENT));
+                    isIncTick = false;
+                } else {
+                    isIncTick = true;
+                }
+            } else if (x != tx) {
+                pressCoord(hand, direction, x, tx, CoordPanelBlock.CoordPanelButtons.ADD_X, CoordPanelBlock.CoordPanelButtons.SUB_X);
+            } else if (y != ty) {
+                pressCoord(hand, direction, y, ty, CoordPanelBlock.CoordPanelButtons.ADD_Y, CoordPanelBlock.CoordPanelButtons.SUB_Y);
+            } else if (z != tz) {
+                pressCoord(hand, direction, z, tz, CoordPanelBlock.CoordPanelButtons.ADD_Z, CoordPanelBlock.CoordPanelButtons.SUB_Z);
+            } else {
+                LOOP++;
+            }
+        } else {
+            LOOP = 0;
         }
     }
 
-    public static void pressCoord(int num, Hand hand, Direction direction, CoordPanelBlock.CoordPanelButtons button, CoordPanelTileEntity tile) throws NoSuchFieldException, IllegalAccessException {
-        for(int i = 0; i < Math.abs(num); i++){
-            if(isNoCoordPanel()) return;
-            pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, button));
-        }
-    }
-
-    public static void setToInc(CoordPanelTileEntity tile, Hand hand, Direction direction, int i) throws NoSuchFieldException, IllegalAccessException {
-        while (tile.incrementValue != i){
-            if(isNoCoordPanel()) return;
-            pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.INCREMENT));
+    private static void pressCoord(Hand hand, Direction direction, int current, int target, CoordPanelBlock.CoordPanelButtons addButton, CoordPanelBlock.CoordPanelButtons subButton) {
+        if (current > target) {
+            pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, subButton));
+        } else {
+            pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, addButton));
         }
     }
 
@@ -77,34 +86,26 @@ public class CoordHandler{
             Minecraft mc = Minecraft.getInstance();
 
             BlockPos panelPos = Utils.getBlockPanelAroundPlayer(mc.player, DMBlocks.COORD_PANEL.get());
-            CoordPanelTileEntity tile = (CoordPanelTileEntity) mc.player.level.getBlockEntity(panelPos);
+            tile = (CoordPanelTileEntity) mc.player.level.getBlockEntity(panelPos);
 
-            Direction dir = mc.level.getBlockState(panelPos).getValue(RotatableTileEntityBase.FACING);
+            direction = mc.level.getBlockState(panelPos).getValue(RotatableTileEntityBase.FACING);
 
             BlockPos tPos = ClientTardisFlightCache.getTardisFlightData(panelPos).getPos();
 
-            Map<Integer, Integer> xList = getPowerMap(x);
-            Map<Integer, Integer> yList = getPowerMap(y);
-            Map<Integer, Integer> zList = getPowerMap(z);
+            xList = getPowerMap(x);
+            yList = getPowerMap(y);
+            zList = getPowerMap(z);
 
-            Map<Integer, Integer> xtList = getPowerMap(tPos.getX());
-            Map<Integer, Integer> ytList = getPowerMap(tPos.getY());
-            Map<Integer, Integer> ztList = getPowerMap(tPos.getZ());
+            txList = getPowerMap(tPos.getX());
+            tyList = getPowerMap(tPos.getY());
+            tzList = getPowerMap(tPos.getZ());
 
-            Hand hand = Hand.MAIN_HAND;
-
-            new Thread(() -> {
-                try {
-                    handleThread(tile, hand, xList, yList, zList, dir, xtList, ytList, ztList);
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }).start();
+            isRunning = true;
         }
     }
 
-    public static BlockRayTraceResult getButtonBlockRayTraceResult(BlockPos pos, Direction side, CoordPanelBlock.CoordPanelButtons button) throws IllegalAccessException, NoSuchFieldException {
-        ButtonsAccessor accessor = (ButtonsAccessor)(Object) button;
+    public static BlockRayTraceResult getButtonBlockRayTraceResult(BlockPos pos, Direction side, CoordPanelBlock.CoordPanelButtons button) {
+        ButtonsAccessor accessor = (ButtonsAccessor) (Object) button;
 
         Vector2f vec = accessor.getValues().get(side);
         float height = accessor.getHeight();
@@ -115,7 +116,7 @@ public class CoordHandler{
         return new BlockRayTraceResult(new Vector3d(pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ), side, pos, false);
     }
 
-    public static Map<Integer, Integer> getPowerMap(int value) {
+    private static Map<Integer, Integer> getPowerMap(int value) {
         boolean isNegative = false;
         if (value < 0) {
             isNegative = true;
@@ -151,8 +152,7 @@ public class CoordHandler{
         return map;
     }
 
-
-    public static void invertIntArray(int[] arr) {
+    private static void invertIntArray(int[] arr) {
         int length = arr.length;
         for (int i = 0; i < length / 2; i++) {
             int temp = arr[i];

@@ -14,45 +14,52 @@ import net.minecraft.util.math.vector.Vector3d;
 import org.theplaceholder.dmcm.interfaces.ButtonsAccessor;
 import org.theplaceholder.dmcm.utils.Utils;
 
-import static org.theplaceholder.dmcm.utils.ButtonUtils.pressButton;
+import static org.theplaceholder.dmcm.utils.Utils.pressButton;
 
 public class DimHandler {
+    public static boolean isRunning = false;
+    public static int id;
+    public static int orId;
+    public static BlockPos pos;
+    public static Direction dir;
+
     public static boolean isNoDimPanel() {
-        return (Utils.getBlockPanelAroundPlayer(Minecraft.getInstance().player, DMBlocks.DIMENSION_SELECTOR_PANEL.get()) == BlockPos.ZERO);
+        return Utils.getBlockPanelAroundPlayer(Minecraft.getInstance().player, DMBlocks.DIMENSION_SELECTOR_PANEL.get()) == BlockPos.ZERO;
     }
 
-    public static void handle(int id){
-        if (!isNoDimPanel()){
+    public static void handle(int id) {
+        if (!isNoDimPanel()) {
             Minecraft mc = Minecraft.getInstance();
-
             BlockPos panelPos = Utils.getBlockPanelAroundPlayer(mc.player, DMBlocks.DIMENSION_SELECTOR_PANEL.get());
             Direction dir = mc.level.getBlockState(panelPos).getValue(RotatableTileEntityBase.FACING);
             DimensionSelectorTileEntity tile = (DimensionSelectorTileEntity) mc.level.getBlockEntity(panelPos);
 
-            new Thread(() -> {
-                try {
-                    handleThread(id, tile.getIndex(), panelPos, dir);
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+            isRunning = true;
+            DimHandler.id = id;
+            orId = tile.getIndex();
+            pos = panelPos;
+            DimHandler.dir = dir;
         }
     }
 
-    public static void handleThread(int id, int orId, BlockPos pos, Direction dir) throws NoSuchFieldException, IllegalAccessException {
-        if(id > orId)
-            for(int i = 0; i < Math.abs(id - orId); i++){
-                pressButton(Hand.MAIN_HAND, getButtonBlockRayTraceResult(pos, dir, DimensionSelectorPanelBlock.DimensionPanelButtons.BTN_RIGHT));
-            }
-        else
-            for (int i = Math.abs(id - orId); i > 0; i--) {
-                pressButton(Hand.MAIN_HAND, getButtonBlockRayTraceResult(pos, dir, DimensionSelectorPanelBlock.DimensionPanelButtons.BTN_LEFT));
-            }
-        pressButton(Hand.MAIN_HAND, getButtonBlockRayTraceResult(pos, dir, DimensionSelectorPanelBlock.DimensionPanelButtons.BTN_SELECT));
+    public static void tick() {
+        if (isNoDimPanel()) {
+            isRunning = false;
+            return;
+        }
+
+        if (id == orId) {
+            isRunning = false;
+            pressButton(Hand.MAIN_HAND, getButtonBlockRayTraceResult(pos, dir, DimensionSelectorPanelBlock.DimensionPanelButtons.BTN_SELECT));
+        } else if (id > orId) {
+            pressButton(Hand.MAIN_HAND, getButtonBlockRayTraceResult(pos, dir, DimensionSelectorPanelBlock.DimensionPanelButtons.BTN_RIGHT));
+        } else {
+            pressButton(Hand.MAIN_HAND, getButtonBlockRayTraceResult(pos, dir, DimensionSelectorPanelBlock.DimensionPanelButtons.BTN_LEFT));
+        }
     }
 
-    public static BlockRayTraceResult getButtonBlockRayTraceResult(BlockPos pos, Direction side, DimensionSelectorPanelBlock.DimensionPanelButtons button) throws IllegalAccessException, NoSuchFieldException {
-        ButtonsAccessor accessor = (ButtonsAccessor)(Object) button;
+    public static BlockRayTraceResult getButtonBlockRayTraceResult(BlockPos pos, Direction side, DimensionSelectorPanelBlock.DimensionPanelButtons button) {
+        ButtonsAccessor accessor = (ButtonsAccessor) (Object) button;
         Vector2f vec = accessor.getValues().get(side);
         float height = accessor.getHeight();
 
