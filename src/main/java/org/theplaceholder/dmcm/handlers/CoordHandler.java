@@ -9,28 +9,26 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.math.vector.Vector3d;
 import org.theplaceholder.dmcm.interfaces.ButtonsAccessor;
 import org.theplaceholder.dmcm.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.theplaceholder.dmcm.utils.Utils.getButtonBlockRayTraceResult;
 import static org.theplaceholder.dmcm.utils.Utils.pressButton;
 
 public class CoordHandler {
-    public static boolean isRunning = false;
-    public static Map<Integer, Integer> xList, yList, zList, txList, tyList, tzList;
-    public static CoordPanelTileEntity tile;
-    public static Direction direction;
-    public static int LOOP = 0;
-    public static boolean isIncTick = true;
-
-    public static int x, y, z;
-
     private static final int MAX_LOOP = 4;
+    private static final int[] POWERS_OF_TEN = {1, 10, 100, 1000};
+
+    public static boolean isRunning = false;
+    private static Map<Integer, Integer> xList, yList, zList, txList, tyList, tzList;
+    private static CoordPanelTileEntity tile;
+    private static Direction direction;
+    private static int LOOP = 0;
+    private static boolean isIncTick = true;
+    private static int x, y, z;
 
     public static boolean isNoCoordPanel() {
         return Utils.getBlockPanelAroundPlayer(Minecraft.getInstance().player, DMBlocks.COORD_PANEL.get()) == BlockPos.ZERO;
@@ -43,51 +41,39 @@ public class CoordHandler {
         }
 
         if (LOOP <= MAX_LOOP) {
-            int i = (int) Math.pow(10, LOOP);
+            int powerOfTen = (int) Math.pow(10, LOOP);
 
-            if (x == 0 && y == 0 && z == 0){
-                x = xList.getOrDefault(i, 0);
-                y = yList.getOrDefault(i, 0);
-                z = zList.getOrDefault(i, 0);
+            if (x == 0 && y == 0 && z == 0) {
+                x = xList.getOrDefault(powerOfTen, 0);
+                y = yList.getOrDefault(powerOfTen, 0);
+                z = zList.getOrDefault(powerOfTen, 0);
             }
 
-            int tx = txList.getOrDefault(i, 0);
-            int ty = tyList.getOrDefault(i, 0);
-            int tz = tzList.getOrDefault(i, 0);
+            int tx = txList.getOrDefault(powerOfTen, 0);
+            int ty = tyList.getOrDefault(powerOfTen, 0);
+            int tz = tzList.getOrDefault(powerOfTen, 0);
 
             Hand hand = Hand.MAIN_HAND;
 
-            if (tile.incrementValue != i) {
+            if (tile.incrementValue != powerOfTen) {
                 if (isIncTick) {
-                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.INCREMENT));
+                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, (ButtonsAccessor)(Object) CoordPanelBlock.CoordPanelButtons.INCREMENT));
                     isIncTick = false;
                 } else {
                     isIncTick = true;
                 }
             } else if (x != tx) {
-                if (x < tx) {
-                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.SUB_X));
-                    x++;
-                } else {
-                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.ADD_X));
-                    x--;
-                }
+                CoordPanelBlock.CoordPanelButtons buttonType = (x < tx) ? CoordPanelBlock.CoordPanelButtons.SUB_X : CoordPanelBlock.CoordPanelButtons.ADD_X;
+                pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, (ButtonsAccessor)(Object)  buttonType));
+                x += (x < tx) ? 1 : -1;
             } else if (y != ty) {
-                if (y < ty) {
-                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.SUB_Y));
-                    y++;
-                } else {
-                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.ADD_Y));
-                    y--;
-                }
+                CoordPanelBlock.CoordPanelButtons buttonType = (y < ty) ? CoordPanelBlock.CoordPanelButtons.SUB_Y : CoordPanelBlock.CoordPanelButtons.ADD_Y;
+                pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, (ButtonsAccessor)(Object)  buttonType));
+                y += (y < ty) ? 1 : -1;
             } else if (z != tz) {
-                if (z < tz) {
-                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.SUB_Z));
-                    z++;
-                } else {
-                    pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, CoordPanelBlock.CoordPanelButtons.ADD_Z));
-                    z--;
-                }
+                CoordPanelBlock.CoordPanelButtons buttonType = (z < tz) ? CoordPanelBlock.CoordPanelButtons.SUB_Z : CoordPanelBlock.CoordPanelButtons.ADD_Z;
+                pressButton(hand, getButtonBlockRayTraceResult(tile.getBlockPos(), direction, (ButtonsAccessor)(Object) buttonType));
+                z += (z < tz) ? 1 : -1;
             } else {
                 LOOP++;
                 x = 0;
@@ -123,18 +109,6 @@ public class CoordHandler {
         }
     }
 
-    public static BlockRayTraceResult getButtonBlockRayTraceResult(BlockPos pos, Direction side, CoordPanelBlock.CoordPanelButtons button) {
-        ButtonsAccessor accessor = (ButtonsAccessor) (Object) button;
-
-        Vector2f vec = accessor.getValues().get(side);
-        float height = accessor.getHeight();
-
-        float hitX = vec.x;
-        float hitY = height / 2.0F;
-        float hitZ = vec.y;
-        return new BlockRayTraceResult(new Vector3d(pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ), side, pos, false);
-    }
-
     private static Map<Integer, Integer> getPowerMap(int value) {
         boolean isNegative = false;
         if (value < 0) {
@@ -151,14 +125,13 @@ public class CoordHandler {
         }
         invertIntArray(ints);
 
-        int[] powers = {1, 10, 100, 1000};
-        for (int i = 0; i < Math.min(ints.length, powers.length); i++) {
-            map.put(powers[i], ints[i]);
+        for (int i = 0; i < Math.min(ints.length, POWERS_OF_TEN.length); i++) {
+            map.put(POWERS_OF_TEN[i], ints[i]);
         }
 
-        if (ints.length > powers.length) {
+        if (ints.length > POWERS_OF_TEN.length) {
             int multiplier = 1;
-            for (int i = powers.length; i < ints.length; i++) {
+            for (int i = POWERS_OF_TEN.length; i < ints.length; i++) {
                 map.put(10 * multiplier, ints[i]);
                 multiplier *= 10;
             }

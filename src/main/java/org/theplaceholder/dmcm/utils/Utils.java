@@ -1,14 +1,19 @@
 package org.theplaceholder.dmcm.utils;
 
+import com.swdteam.common.block.tardis.CoordPanelBlock;
 import com.swdteam.common.tardis.TardisData;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.play.client.CPlayerTryUseItemOnBlockPacket;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.vector.Vector2f;
+import net.minecraft.util.math.vector.Vector3d;
+import org.theplaceholder.dmcm.interfaces.ButtonsAccessor;
 
 import java.util.Objects;
 
@@ -30,6 +35,17 @@ public class Utils {
 
     public static void pressButton(Hand hand, BlockRayTraceResult rayTraceResult){
         Minecraft.getInstance().getConnection().send(new CPlayerTryUseItemOnBlockPacket(hand, rayTraceResult));
+    }
+
+    public static BlockRayTraceResult getButtonBlockRayTraceResult(BlockPos pos, Direction side, ButtonsAccessor button) {
+
+        Vector2f vec = button.getValues().get(side);
+        float height = button.getHeight();
+
+        float hitX = vec.x;
+        float hitY = height / 2.0F;
+        float hitZ = vec.y;
+        return new BlockRayTraceResult(new Vector3d(pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ), side, pos, false);
     }
 }
 

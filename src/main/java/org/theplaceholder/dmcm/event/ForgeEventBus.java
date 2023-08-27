@@ -45,7 +45,6 @@ public class ForgeEventBus {
                 }else if (CoordHandler.isRunning) {
                     CoordHandler.tick();
                 }
-
                 ticks = 0;
             }
         }
